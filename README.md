@@ -4,9 +4,7 @@ We developed scImmuneCo, a comprehensive resource of cell-type-specific transcri
 
 ScImmuneCo represents a significant methodological advance by providing stable, reusable modules that overcome single-dataset limitations; resolving cell-type-specific functional programs lost in bulk analyses; capturing transitional cellular states often missed by conventional clustering. 
 
-<img src="./man/Figure1_00.png" width="100%" style="display: block; margin: auto;" />
-
-
+<img src="./man/figures/Figure1.png" width="100%" style="display: block; margin: auto;" />
 ## Intallation
 ``` r
 library(devtools)
