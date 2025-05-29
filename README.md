@@ -5,11 +5,12 @@ We developed scImmuneCo, a comprehensive resource of cell-type-specific transcri
 ScImmuneCo represents a significant methodological advance by providing stable, reusable modules that overcome single-dataset limitations; resolving cell-type-specific functional programs lost in bulk analyses; capturing transitional cellular states often missed by conventional clustering. 
 
 <img src="./man/figures/Figure1.png" width="100%" style="display: block; margin: auto;" />
+
 ## Intallation
 ``` r
 library(devtools)
 devtools::install_github("FrankQYW/scImmuneCo_R")
-``` r
+```
 
 
 ## Usage
@@ -20,7 +21,7 @@ A preprocessed PBMC single cell RNA-seq is required to run the scImmuneCo packag
 ``` r
 library(Azimuth)
 seurat_object <- RunAzimuth(seurat_object, reference = "pbmcref")
-``` r
+```
 
 As a result, the meta_data of seurat_object will have a 'predicted.celltype.l1' column contain the cell type:
 
@@ -29,11 +30,11 @@ As a result, the meta_data of seurat_object will have a 'predicted.celltype.l1' 
 unique(seurat_object@meta.data$predicted.celltype.l1)
 
 [1] "CD8 T"   "CD4 T"   "Mono"    "other T" "DC"      "B"       "NK"      "other" 
-``` r
+``` 
 
 Users could also manually annotate the single cell data as long as the name of the cell type aligned with the ones in Azimuth reference. 
 
 
-###
+
 
 
