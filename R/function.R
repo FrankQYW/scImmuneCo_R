@@ -98,6 +98,9 @@ compare_condition <- function(seurat_object,gsva, sample_column, condition_colum
   results <- limma::topTable(fit, coef = x[1], number = nrow(fit))
 
   results <- tibble::rownames_to_column(results)
+  merge_info <- module_info[, c('name', 'merge_module')]
+  merge_info <- merge_info[!duplicated(merge_info$name), ]
+  results <- dplyr::left_join(results, merge_info, by = c('rowname' = 'name'))
 
   return(results)
 }
@@ -140,8 +143,6 @@ do_dep <- function(seurat_object, sample_column, gmt = module_info, condition_co
 
   }
   final_results$disease <- condition1
-
-
 
   return(final_results)
 
@@ -203,7 +204,7 @@ draw_volcano <- function(comparison, p_cutoff = 0.05, logFC_cutoff = 0.25) {
 
   colnames(select_results)[2] <- 'avg_log2FC'
   colnames(select_results)[5] <- 'p_val'
-  colnames(select_results)[8] <- 'cluster'
+  colnames(select_results)[9] <- 'cluster'
   colnames(select_results)[1] <- 'gene'
 
 
@@ -225,6 +226,79 @@ draw_volcano <- function(comparison, p_cutoff = 0.05, logFC_cutoff = 0.25) {
 }
 
 
+#' Visualize Differential Expression by Module
+#'
+#' Creates a plot showing differentially expressed genes grouped by modules,
+#' with modules ordered numerically (e.g., CD4T_1, CD4T_2, etc.).
+#' Significant genes (P.Value < threshold) are colored by logFC while
+#' non-significant genes appear in gray.
+#'
+#' @param deg_results A dataframe containing differential expression results.
+#' Must include columns: `merge_module`, `logFC`, and `P.Value`.
+#' @param pval_threshold P-value cutoff for significance (default = 0.05).
+#' @param point_size Size of points in the plot (default = 3).
+#' @param jitter_width Width of jitter for point positioning (default = 0.15).
+#'
+#' @return A ggplot object showing module-separated DEG visualization.
+#'
+#' @importFrom dplyr mutate group_by ungroup
+#' @importFrom stringr str_extract
+#' @importFrom ggplot2 ggplot aes geom_rect geom_point scale_color_gradient2
+#' @importFrom ggplot2 theme_minimal theme labs position_jitter
+#' @importFrom stats reorder
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Example usage:
+#' data(example_deg_results)  # Your DEG dataframe
+#' plot_module_deg(example_deg_results)
+#' }
+plot_module_deg <- function(deg_results,
+                            pval_threshold = 0.05,
+                            point_size = 3,
+                            jitter_width = 0.15) {
 
+  # Process data with explicit package references
+  plot_data <- deg_results %>%
+    dplyr::mutate(
+      module_number = as.numeric(stringr::str_extract(.data$merge_module, "(?<=_)\\d+")),
+      merge_module = stats::reorder(.data$merge_module, .data$module_number)
+    ) %>%
+    dplyr::group_by(.data$merge_module) %>%
+    dplyr::mutate(module_position = dplyr::cur_group_id()) %>%
+    dplyr::ungroup()
 
+  # Create plot with explicit package references
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$merge_module, y = .data$logFC)) +
+    ggplot2::geom_rect(
+      ggplot2::aes(
+        xmin = as.numeric(.data$merge_module) - 0.5,
+        xmax = as.numeric(.data$merge_module) + 0.5,
+        ymin = min(.data$logFC) - 0.5,
+        ymax = max(.data$logFC) + 0.5
+      ),
+      fill = NA, color = "gray70", linewidth = 0.5
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(color = ifelse(.data$P.Value < pval_threshold, .data$logFC, NA)),
+      size = point_size,
+      position = ggplot2::position_jitter(width = jitter_width, height = 0)
+    ) +
+    ggplot2::scale_color_gradient2(
+      low = "skyblue", mid = "white", high = "red",
+      midpoint = 0,
+      na.value = "gray80",
+      name = paste0("log2FC\n(P < ", pval_threshold, ")")
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+      panel.grid.major.x = ggplot2::element_blank()
+    ) +
+    ggplot2::labs(x = "Gene Modules", y = "log2 Fold Change")
+  # Add y-axis limits based on logFC range
+  p
+  return(p)
+}
 
