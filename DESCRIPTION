@@ -1,0 +1,22 @@
+Package: scImmuneCo
+Title: Analyzing the transcriptomic data based on cell type specific co-expression module
+Version: 0.0.0.9000
+Authors@R: 
+    person("Frank Qingyun", "Wang", , "frkwang@connect.hku.hk", role = c("aut", "cre"))
+Description: Analyzing the transcriptomic data based on cell type specific co-expression module.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+  Seurat (>= 4.0.0),
+  GSVA,
+  stringr, 
+  tidyverse,
+  limma,
+  clusterProfiler,
+  scRNAtoolVis
+Depends: 
+    R (>= 3.5)
+LazyData: true
