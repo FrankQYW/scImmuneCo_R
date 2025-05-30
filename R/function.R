@@ -118,7 +118,7 @@ compare_condition <- function(seurat_object,gsva, sample_column, condition_colum
 #' @param condition2 Second condition to compare
 #' @return Differentially expressed modules
 #' @export
-do_dep <- function(seurat_object, sample_column, gmt = module_info, condition_column = 'Groups', condition1 = 'SLE',
+do_dem <- function(seurat_object, sample_column = 'batch', gmt = module_info, condition_column = 'condition', condition1 = 'SjS',
                    condition2 = 'HC'){
   seurat_object@meta.data[,sample_column] <- gsub('_','-', seurat_object@meta.data[,sample_column])
   sample_data <- unique(seurat_object@meta.data[, c(sample_column, condition_column)])
@@ -218,10 +218,11 @@ draw_volcano <- function(comparison, p_cutoff = 0.05, logFC_cutoff = 0.25) {
     )
 
 
-  scRNAtoolVis::jjVolcano(diffData = select_results, topGeneN = 0, tile.col = beautiful_colors,
+  a <- scRNAtoolVis::jjVolcano(diffData = select_results, topGeneN = 0, tile.col = beautiful_colors,
             back.col= 'white', log2FC.cutoff = logFC_cutoff) + ggplot2::xlab(''
             ) + ggplot2::ylab('') + ggplot2::theme(legend.position = "none")
-
+  print(a)
+  return(a)
 
 }
 
