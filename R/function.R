@@ -270,6 +270,8 @@ plot_module_deg <- function(deg_results,
     dplyr::mutate(module_position = dplyr::cur_group_id()) %>%
     dplyr::ungroup()
 
+
+
   # Create plot with explicit package references
   p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$merge_module, y = .data$logFC)) +
     ggplot2::geom_rect(
@@ -302,4 +304,96 @@ plot_module_deg <- function(deg_results,
   p
   return(p)
 }
+
+
+
+
+
+
+
+#' Visualize enrichment results as a bar plot
+#'
+#' Creates a bar plot of enrichment results ordered by -log10(p-value) and colored by cell type.
+#' The function automatically merges cell type information if not already present in the data.
+#'
+#' @param data A dataframe containing enrichment results with columns: ID, pvalue, and optionally cell_type.
+#' @param module_info A dataframe mapping module names to cell types (required if cell_type not in data).
+#'                   Should contain columns: name, cell_type.
+#'
+#' @return A ggplot object showing enrichment results visualization.
+#'
+#' @importFrom ggplot2 ggplot aes geom_bar labs scale_fill_brewer theme_minimal theme element_text
+#' @importFrom dplyr left_join mutate arrange desc
+#' @importFrom scales brewer_pal
+#' @importFrom stats reorder
+#' @export
+plot_enrichment_bars <- function(data, pvalue_threshold = 0.05) {
+
+    # Prepare module info (remove duplicates)
+  merge_info <- module_info[, c('name', 'cell_type')]
+  merge_info <- merge_info[!duplicated(merge_info$name), ]
+
+    # Merge with data
+  data <- dplyr::left_join(data, merge_info, by = c('ID' = 'name'))
+  data <- dplyr::filter(data, data$pvalue < pvalue_threshold)
+
+
+  # Check other required columns
+  required_cols <- c("ID", "pvalue", "cell_type")
+  missing_cols <- setdiff(required_cols, colnames(data))
+  if (length(missing_cols) > 0) {
+    stop(paste("Missing required columns:", paste(missing_cols, collapse = ", ")))
+  }
+
+  # Prepare the data
+  plot_data <- data %>%
+    dplyr::mutate(
+      log10_pvalue = -log10(pvalue),
+      ID = factor(ID)
+    ) %>%
+    dplyr::arrange(dplyr::desc(log10_pvalue))
+
+  # Reorder factor levels to preserve sorting
+  plot_data$ID <- factor(plot_data$ID,
+                         levels = plot_data$ID[order(plot_data$log10_pvalue,
+                                                     decreasing = TRUE)])
+  beautiful_colors <- c(
+    'Mono' = "#E63946",  # Vibrant red
+    'DC' = "#F4A261",  # Warm orange
+    'CD8T' = "#2A9D8F",  # Teal green
+    'CD4T' = "#264653",  # Dark blue-green
+    'NK' = "#E9C46A",  # Golden yellow
+    'other_T' = "#6A4C93",  # Rich purple
+    'B' = "#3A86FF"   # Bright blue
+  )
+  # Create plot
+  a <- ggplot2::ggplot(plot_data,
+                  ggplot2::aes(x = stats::reorder(ID, log10_pvalue),
+                               y = log10_pvalue,
+                               fill = cell_type)) +
+    ggplot2::geom_bar(stat = "identity", width = 0.8) +
+    ggplot2::labs(
+      x = NULL,
+      y = "-log10(p-value)",
+      title = "Enrichment Results",
+      fill = "Cell Type"
+    ) +
+    ggplot2::scale_fill_manual(values = beautiful_colors,
+                               na.value = "grey50") +  # For any cell types not in our palette
+    ggplot2::theme_minimal(base_size = 11) +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+      plot.title = ggplot2::element_text(hjust = 0.5, face = "bold"),
+      panel.grid.major.x = ggplot2::element_blank(),
+      legend.position = "right"
+    ) +
+    ggplot2::coord_flip()  # Flip for better readability of long IDs
+  return(a)
+}
+
+
+
+
+
+
 
