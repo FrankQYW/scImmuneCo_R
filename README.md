@@ -1,20 +1,20 @@
 # scImmuneCo
-## About
+## 1. About
 We developed scImmuneCo, a comprehensive resource of cell-type-specific transcriptional modules derived from single-cell RNA sequencing data. Our analytical framework, applied to 17 immunological conditions spanning autoimmunity, immunodeficiency, infection, and hematologic malignancies, identified 873 co-expression modules across seven major immune cell types. 
 
 ScImmuneCo represents a significant methodological advance by providing stable, reusable modules that overcome single-dataset limitations; resolving cell-type-specific functional programs lost in bulk analyses; capturing transitional cellular states often missed by conventional clustering. 
 
 <img src="./man/figures/Figure1.png" width="100%" style="display: block; margin: auto;" />
 
-## Intallation
+## 2. Intallation
 ``` r
 library(devtools)
 devtools::install_github("FrankQYW/scImmuneCo_R")
 ```
 
 
-## Module level expression analysis
-### Preprocess of the data
+## 3. Module level expression analysis
+### 3.1 Preprocess of the data
 A preprocessed PBMC single cell RNA-seq in Seurat format is required to run the scImmuneCo package. Users are suggested to use Azimuth to map the PBMC data to the reference cell types. 
 
 
@@ -36,7 +36,7 @@ Users could also manually annotate the single cell data as long as the *name of 
 
 
 
-### Identify Differentially Expressed Modules Between Conditions
+### 3.2 Identify Differentially Expressed Modules Between Conditions
 We provide a convenient one line function to test modules in all cell types between two conditions.   
 
 
@@ -68,7 +68,7 @@ res <- compare_condition(seurat_object, gsva = a,
 ``` 
 
 
-### Visualization
+### 3.3 Visualization
 
 The overall results can be visualized by 
 
@@ -92,7 +92,7 @@ plot_module_deg(Mono_res)
 
 
 
-## Module Enrichment Analysis
+## 4. Module Enrichment Analysis
 The users can also perform module enrichment analysis on a list of genes. The function will return the enriched modules in each cell type. 
 
 ``` r
@@ -101,4 +101,5 @@ plot_enrichment_bars(enrichment_res@result)
 
 ```
 <img src="./man/figures/enrichment_barplot.png" width="100%" style="display: block; margin: auto;" />
+
 
