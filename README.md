@@ -7,7 +7,18 @@ ScImmuneCo represents a significant methodological advance by providing stable, 
 <img src="./man/figures/Figure1.png" width="100%" style="display: block; margin: auto;" />
 
 ## 2. Intallation
+
+
+
 ``` r
+### install dependency
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+    
+BicocManager::install(c("Seurat", "Azimuth", "GSVA", "ggplot2", "dplyr", "tidyr",                                "ggplot2", "limma"))
+
+
+
 library(devtools)
 devtools::install_github("FrankQYW/scImmuneCo_R")
 ```
