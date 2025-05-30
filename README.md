@@ -76,7 +76,7 @@ draw_volcano(res, p_cutoff = 0.05, logFC_cutoff = 0.25)
 
 ``` 
 
-<img src="./man/figures/volcano.png" width="100%" style="display: block; margin: auto;" />
+<img src="./man/figures/general_volcano.png" width="100%" style="display: block; margin: auto;" />
 
 
 Can also visualize the differential expressed modules on meta module level in each cell type
@@ -87,4 +87,4 @@ Mono_res <- filter(res, res$cell_type == 'Mono')
 
 ``` 
 
-<img src="./man/figures/meta_module_volcano.png" width="100%" style="display: block; margin: auto;" />
+<img src="./man/figures/meta_volcano.png" width="100%" style="display: block; margin: auto;" />
