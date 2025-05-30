@@ -32,7 +32,7 @@ unique(seurat_object@meta.data$predicted.celltype.l1)
 [1] "CD8 T"   "CD4 T"   "Mono"    "other T" "DC"      "B"       "NK"      "other" 
 ``` 
 
-Users could also manually annotate the single cell data as long as the *name of the cell type* aligned with the ones in Azimuth reference. 
+Users could also manually annotate the single cell data as long as the **name of the cell type** aligned with the ones in Azimuth reference. 
 
 
 
