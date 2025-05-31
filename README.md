@@ -6,7 +6,7 @@ ScImmuneCo represents a significant methodological advance by providing stable, 
 
 <img src="./man/figures/Figure1.png" width="100%" style="display: block; margin: auto;" />
 
-## 2. Intallation
+## 2. Installation
 
 
 
@@ -15,7 +15,7 @@ ScImmuneCo represents a significant methodological advance by providing stable, 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
     
-BicocManager::install(c("Seurat", "Azimuth", "GSVA", "ggplot2", "dplyr", "tidyr",                                "ggplot2", "limma"))
+BicocManager::install(c("Seurat", "Azimuth", "GSVA", "ggplot2", "dplyr", "tidyr", "ggplot2", "limma"))
 
 
 
@@ -45,6 +45,18 @@ unique(seurat_object@meta.data$predicted.celltype.l1)
 
 Users could also manually annotate the single cell data as long as the **name of the cell type** aligned with the ones in Azimuth reference. 
 
+
+
+Can also decipher the bulk data on the cell type specific co-expression module level using GSVA. The module level expression can be used to perform differential expression analysis between conditions using limma or correlate with clinical features. 
+
+``` r
+gmt <- read.csv('./data/module_info.csv')
+gmt <- dplyr::select(gmt, c(5,1))
+gmt <- split(gmt$gene, gmt$name, drop = TRUE)
+
+gsva_result <- gsva(exp, gmt, kcdf = 'Gaussian',
+                    verbose = F)
+``` 
 
 
 ### 3.2 Identify Differentially Expressed Modules Between Conditions
