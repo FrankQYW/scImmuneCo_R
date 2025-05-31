@@ -47,17 +47,6 @@ Users could also manually annotate the single cell data as long as the **name of
 
 
 
-Can also decipher the bulk data on the cell type specific co-expression module level using GSVA. The module level expression can be used to perform differential expression analysis between conditions using limma or correlate with clinical features. 
-
-``` r
-gmt <- read.csv('./data/module_info.csv')
-gmt <- dplyr::select(gmt, c(5,1))
-gmt <- split(gmt$gene, gmt$name, drop = TRUE)
-
-gsva_result <- gsva(exp, gmt, kcdf = 'Gaussian',
-                    verbose = F)
-``` 
-
 
 ### 3.2 Identify Differentially Expressed Modules Between Conditions
 We provide a convenient one line function to test modules in all cell types between two conditions.   
@@ -113,6 +102,19 @@ plot_module_deg(Mono_res)
 
 <img src="./man/figures/meta_volcano.png" width="100%" style="display: block; margin: auto;" />
 
+
+### 3.4 GSVA on bulk data
+
+Can also decipher the bulk data on the cell type specific module level using GSVA. The module level expression can be used to perform differential expression analysis between conditions using limma or correlate with clinical features. 
+
+``` r
+gmt <- read.csv('./data/module_info.csv')
+gmt <- dplyr::select(gmt, c(5,1))
+gmt <- split(gmt$gene, gmt$name, drop = TRUE)
+
+gsva_result <- gsva(exp, gmt, kcdf = 'Gaussian',
+                    verbose = F)
+``` 
 
 
 ## 4. Module Enrichment Analysis
