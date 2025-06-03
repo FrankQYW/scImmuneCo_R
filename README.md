@@ -72,7 +72,7 @@ The users can also choose a specific cell type to test the modules difference be
 gsva_matrix <- gsva_cell_type(seurat_object, cell = 'CD4 T', sample_column = 'batch', 
           cell_column = "predicted.celltype.l1",)
 
-res <- compare_condition(seurat_object, gsva = a, 
+res <- compare_condition(seurat_object, gsva = gsva_matrix, 
                        sample_column = 'batch', 
                        condition_column = 'condition', 
                        condition1 = 'SjS', 
