@@ -34,7 +34,7 @@ gsva_cell_type <- function(seurat_object, cell_column = 'predicted.celltype.l1',
   }
 
 
-  print(gmt)
+
   gmt <- dplyr::filter(gmt, gmt$cell_type == cell_clean)
 
   gmt <- dplyr::select(gmt, c(5,1))
