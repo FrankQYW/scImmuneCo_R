@@ -118,80 +118,35 @@ compare_condition <- function(seurat_object,gsva, sample_column, condition_colum
 #' @param condition2 Second condition to compare
 #' @return Differentially expressed modules
 #' @export
-do_dem <- function(seurat_object, sample_column = 'batch', gmt = module_info,
-                   condition_column = 'condition', condition1 = 'SjS',
-                   condition2 = 'HC') {
-
-  # Initialize empty results dataframe
+do_dem <- function(seurat_object, sample_column = 'batch', gmt = module_info, condition_column = 'condition', condition1 = 'SjS',
+                   condition2 = 'HC'){
+  seurat_object@meta.data[,sample_column] <- gsub('_','-', seurat_object@meta.data[,sample_column])
+  sample_data <- unique(seurat_object@meta.data[, c(sample_column, condition_column)])
   final_results <- data.frame()
+  for (i in c('other T',"CD8 T", "B", "Mono", "CD4 T", "DC", "NK")){
+    gsva_r <- gsva_cell_type(seurat_object, cell = i , sample_column = sample_column
+                             )
 
-  # Clean sample names
-  tryCatch({
-    seurat_object@meta.data[,sample_column] <- gsub('_','-', seurat_object@meta.data[,sample_column])
-  }, error = function(e) {
-    warning(paste("Error cleaning sample names:", e$message))
-  })
 
-  # Get unique sample data
-  sample_data <- tryCatch({
-    unique(seurat_object@meta.data[, c(sample_column, condition_column)])
-  }, error = function(e) {
-    warning(paste("Error getting sample data:", e$message))
-    NULL
-  })
+    limma_result <- compare_condition(seurat_object, gsva_r, sample_column = sample_column,
+                                      condition_column = condition_column, condition1 = condition1,
+                                      condition2 = condition2)
+    limma_result$cell_type <- i
+    final_results <- rbind(final_results, limma_result)
+    #   write.csv(limma_result, paste0('./', condition1, '/dep_', i, '.csv'))
+    if (i == 'other T'){
+      cell_clean = 'other_T'
+    }else{
+      cell_clean = gsub( ' ', '', i)
+    }
 
-  if (is.null(sample_data)) {
-    warning("Could not proceed - sample data unavailable")
-    return(final_results)
+
   }
-
-  # Process each cell type with error handling
-  for (i in c('other T', "CD8 T", "B", "Mono", "CD4 T", "DC", "NK")) {
-    tryCatch({
-      # GSVA analysis
-      gsva_r <- tryCatch({
-        gsva_cell_type(seurat_object, cell = i, sample_column = sample_column)
-      }, error = function(e) {
-        warning(paste("GSVA failed for cell type", i, ":", e$message))
-        NULL
-      })
-
-      if (is.null(gsva_r)) next
-
-      # Limma comparison
-      limma_result <- tryCatch({
-        compare_condition(seurat_object, gsva_r, sample_column = sample_column,
-                          condition_column = condition_column, condition1 = condition1,
-                          condition2 = condition2)
-      }, error = function(e) {
-        warning(paste("Limma comparison failed for cell type", i, ":", e$message))
-        NULL
-      })
-
-      if (is.null(limma_result)) next
-
-      # Add metadata and store results
-      limma_result$cell_type <- i
-      final_results <- tryCatch({
-        rbind(final_results, limma_result)
-      }, error = function(e) {
-        warning(paste("Failed to combine results for cell type", i, ":", e$message))
-        final_results  # return unchanged results if rbind fails
-      })
-
-    }, error = function(e) {
-      warning(paste("Unexpected error processing cell type", i, ":", e$message))
-    })
-  }
-
-  # Add disease information if we have results
-  if (nrow(final_results) > 0) {
-    final_results$disease <- condition1
-  } else {
-    warning("No results were generated - all iterations failed")
-  }
+  final_results$disease <- condition1
 
   return(final_results)
+
+
 }
 
 #' compare between two conditions
